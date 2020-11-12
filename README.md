@@ -43,7 +43,43 @@ Record can be found here: https://youtu.be/XeccXJ9SI0g
 - 11:10 - 11:15: Break + Q&A
 - 11:15 - 12:00: Result exploration + wrap-up
 
-### Environment
+### Installation
 
-...
+#### Setting up Virtual Environment [Linux or Mac]
+
+Clone this repo with:
+```bash
+git clone https://github.com/fdurier/dsf_2020_royalmail.git
+cd dsf_2020_royalmail/
+```
+Create Virtual **(Linux/Mac)** Environment:
+```bash
+python -m venv royalmail_env
+source royalmail_env/bin/activate
+```
+Make sure that, from now on, you **run all commands from within your virtual environment**.
+
+#### Setting up Virtual Environment [Windows]
+Use the [Github Desktop GUI](https://desktop.github.com/) to clone this repo to your local machine.
+Navigate to the `dsf_2020_royalmail` project folder and open a power shell window by pressing **Shift + Right Click**
+and selecting `Open PowerShell window here` in the drop-down menu.
+
+Create Virtual **(Windows)** Environment:
+
+```powershell
+py -m venv royalmail_env
+.\royalmail_env\Scripts\activate
+```
+Make sure that, from now on, you **run all commands from within your virtual environment**.
+
+#### Install Required Packages [Windows, Mac or Linux]
+Install required packages (from within your virtual environment) via:
+
+```bash
+pip install -r requirements.txt
+```
+If this fails, you may have to upgrade your pip version first with `pip install pip --upgrade`.
+
+## Quick Start (Inference only)
+To test the cat face detector on test images located in [`TrainYourOwnYOLO/Data/Source_Images/Test_Images`](/Data/Source_Images/Test_Images) run the `Minimal_Example.py` script in the root folder with:
 
