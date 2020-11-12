@@ -1,10 +1,10 @@
-# DSF-2020: Royal Mail Workshop
+## DSF-2020: Royal Mail Workshop
 
-## Title
+### Title
 
-Going postal: how to craft a cutting-edge route optimisation engine in-house that suits your business needs
+*"Going postal: how to craft a cutting-edge route optimisation engine in-house that suits your business needs"*
  
-## Abstract
+### Abstract
 
 Royal Mail is the UKs national postal service, delivering 15 billion items to 31 million addresses annually.
 Despite handling more than 50% of British parcels, Royal Mail is on the look out for efficiency
@@ -24,18 +24,18 @@ Building on last year presentation of the general problem, this 3 hours interact
 to go through the entire cycle of a PoC project, covering stakeholder requirements, data acquisition,
 algorithmic modelling as well as service delivery review.
 
-## Target Audience
+### Target Audience
 
 This workshop is designed for all kind of Data Scientists, from hand-on developers to more managerial roles.
 
-## Prerequisites
+### Prerequisites
 
 - Basic python development environment (python >= 3.6, virtualenv, pip)
 - Standard libraries, such as pandas and numpy
 - Also, highly beneficial if attendants are familiar with last year’s DSF talk from Royal Mail.
 Record can be found here: https://youtu.be/XeccXJ9SI0g
 
-## Schedule (GMT)
+### Schedule (GMT)
 
 -  9:00 - 10:00: Business and science context + data management and exploration
 - 10:00 - 10:10: Break + Q&A
@@ -43,7 +43,7 @@ Record can be found here: https://youtu.be/XeccXJ9SI0g
 - 11:10 - 11:15: Break + Q&A
 - 11:15 - 12:00: Result exploration + wrap-up
 
-## Environment
+### Environment
 
 ...
 
