@@ -1,6 +1,6 @@
 ## Sample Variables
 depot_name = "EDINBURGH"
-sample_name = "sample_050"
+sample_name = "sample_143"
 
 ### Hard Constraints
 max_vans = 5
