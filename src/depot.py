@@ -6,6 +6,7 @@ import params
 class depot_class(object):
 
 	def __init__(self):
+		self.depot_id = 'depot'
 		self.postcode = None
 		self.latitude = None
 		self.longitude = None
