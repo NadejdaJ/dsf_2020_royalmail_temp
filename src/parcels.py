@@ -28,7 +28,9 @@ class parcel_class(object):
 		else:
 			sys.exit("\nCAUTION: postcode input file not found...\n")
 
-		self.data = data_df.loc[1:]
+		self.data = data_df.loc[data_df.id != 'depot']
+		self.data.postcode = self.data.postcode.str.replace(" ","")
+		self.stop_list = list(self.data.postcode.unique())
 		self.num_parcels = len(list(self.data.postcode))
 		self.num_stops = len(list(self.data.postcode.unique()))
 

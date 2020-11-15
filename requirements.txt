@@ -35,6 +35,7 @@ nbformat==5.0.8
 nest-asyncio==1.4.3
 notebook==6.1.5
 numpy==1.19.4
+ortools==8.0.8283
 packaging==20.4
 pandas==1.1.4
 pandocfilters==1.4.3
@@ -43,6 +44,7 @@ pexpect==4.8.0
 pickleshare==0.7.5
 prometheus-client==0.8.0
 prompt-toolkit==3.0.8
+protobuf==3.14.0
 ptyprocess==0.6.0
 pycparser==2.20
 Pygments==2.7.2
