@@ -17,6 +17,11 @@ num_ortools_iters = 100
 lns_destroy_frac = 0.4
 lns_stop_converge = 100
 
-## Opex Cost Function
-pounds_per_min = 0.33
-pounds_per_km = 0.25
+## Simulated Annealing Parameters
+# Needs to be greater than 1
+sa_control_temp = 1.33
+# Needs to be smaller than 1
+sa_cooling_rate = 0.81
+
+## Map Zoom Option
+zoom_level = 10

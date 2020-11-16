@@ -2,9 +2,7 @@ import sys
 import time
 from datetime import datetime
 import utils
-from depot import depot_class
-from parcels import parcel_class
-from travel import matrix_class
+from puzzle import puzzle_class
 from routes import routes_class
 from ortools_wrapper import run_or_tools
 
@@ -16,48 +14,40 @@ def main():
 	start_date = datetime.now()
 
 	print("\n##################################################################\n")
-	print("\t...Loading Hub Constraints...")
+	print("\t...Loading Dataset...")
 
-	depot = depot_class()
+	puzzle = puzzle_class()
+
+	init_map(puzzle, "delivery_point_locations.html")
 
 	current_time = utils.mytimeprint(start_time, start_time)
+
 	print("\n##################################################################\n")
-	print("\t...Loading Delivery Data...")
+	print("\t...Building Initial Routes...")
 
-	parcels = parcel_class()
+	init_routes = routes_class(puzzle)
 
-	init_map(depot, parcels, "delivery_point_locations.html")
+	init_routes.build_at_random(puzzle)
+	routes_map(puzzle, init_routes, "init_routes_random.html")
+
+	init_routes.build_from_postcodes(puzzle)
+	routes_map(puzzle, init_routes, "init_routes_postcodes.html")
 
 	current_time = utils.mytimeprint(current_time, start_time)
-	print("\n##################################################################\n")
-	print("\t...Loading Travel Matrix...")
-
-	travel = matrix_class(parcels.data)
-
-	current_time = utils.mytimeprint(current_time, start_time)
-	print("\n##################################################################\n")
-	print("\t...Building Initial Route...")
-
-	init_routes = routes_class(parcels)
-	init_routes.init_random_routes(depot, parcels, travel)
-
-	routes_map(depot, parcels, init_routes, "init_routes_random.html")
-
-	init_routes.init_sector_routes(depot, parcels, travel)
-
-	routes_map(depot, parcels, init_routes, "init_routes_sectors.html")
-
 	print("\n##################################################################\n")
 	print("\t...Input Routes...\n")
 	init_routes.print_route_stats()
 
 	current_time = utils.mytimeprint(current_time, start_time)
+
+	sys.exit()
+
 	print("\n##################################################################\n")
 	print("\t...Running OR-tools solver...")
 
-	or_routes= run_or_tools(depot, parcels, travel, init_routes)
+	or_routes= run_or_tools(puzzle, init_routes)
 
-	routes_map(depot, parcels, or_routes, "ortools_routes_solution.html")
+	routes_map(puzzle, or_routes, "ortools_routes_solution.html")
 
 	print("\n##################################################################\n")
 	print("\t...OR-tools solution...\n")
