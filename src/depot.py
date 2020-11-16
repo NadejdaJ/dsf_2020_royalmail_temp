@@ -24,15 +24,11 @@ class depot_class(object):
 		self.input_path = "../data/input/" + params.depot_name + "/" + params.sample_name
 		suffix = "parcels.csv"
 
-		if not os.path.exists(self.input_path):
-			sys.exit("\nCAUTION: input path not found...\n\n%s\n" % self.input_path)
 		for fname in os.listdir(self.input_path):
 			if fname.endswith(suffix):
 				filename = os.path.join(self.input_path, fname)
 				data_df = pd.read_csv(filename, sep=",", index_col=0)
 				break
-		else:
-			sys.exit("\nCAUTION: postcode input file not found...\n")
 
 		self.postcode = data_df.loc[0].postcode.replace(" ","")
 		self.latitude = data_df.loc[0].latitude

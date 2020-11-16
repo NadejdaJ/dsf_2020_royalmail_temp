@@ -18,15 +18,11 @@ class parcel_class(object):
 		sample_path = "../data/input/" + params.depot_name + "/" + params.sample_name
 		suffix = "parcels.csv"
 
-		if not os.path.exists(sample_path):
-			sys.exit("\nCAUTION: input path not found...\n\n%s\n" % sample_path)
 		for fname in os.listdir(sample_path):
 			if fname.endswith(suffix):
 				filename = os.path.join(sample_path, fname)
 				data_df = pd.read_csv(filename, sep=",", index_col=0)
 				break
-		else:
-			sys.exit("\nCAUTION: postcode input file not found...\n")
 
 		self.data = data_df.loc[data_df.id != 'depot']
 		self.data.postcode = self.data.postcode.str.replace(" ","")
