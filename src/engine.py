@@ -57,6 +57,8 @@ def main():
 
 	or_routes= run_or_tools(depot, parcels, travel, init_routes)
 
+	routes_map(depot, parcels, or_routes, "ortools_routes_solution.html")
+
 	print("\n##################################################################\n")
 	print("\t...OR-tools solution...\n")
 

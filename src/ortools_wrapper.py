@@ -95,8 +95,8 @@ def print_solution(data, manager, routing, solution, postcode_df, iterations, it
 		slacks += slack
 
 		plan_output += 'Time of the route: {}mins\n'.format(int(route_distance / 100) + slack)
-		print(plan_output)
-		print(or_console_output)
+		# print(plan_output)
+		# print(or_console_output)
 		total_distance += route_distance
 
 	print("Number of Iterations: {}".format(iterations))
@@ -165,7 +165,7 @@ def run_or_tools(depot, parcels, travel, init_routes):
 	# search_parameters = pywrapcp.DefaultRoutingSearchParameters()
 	# search_parameters.solution_limit = params.num_ortools_iters
 	# search_parameters.local_search_metaheuristic = SEARCHES[params.search_ortools_options]
-	# search_parameters.log_search = False
+	# search_parameters.log_search = True
 	#
 	# routing.CloseModelWithParameters(search_parameters)  # Close the model to allow the search parameter to take effect
 
@@ -183,12 +183,12 @@ def run_or_tools(depot, parcels, travel, init_routes):
 
 	# Print solution on console.
 	if solution:
-		print("\n")
-		print("OR-tools Solution after search:")
-		print("\n")
+		# print("\n")
+		# print("OR-tools Solution after search:")
+		# print("\n")
 		or_output = print_solution(data, manager, routing, solution, postcode_df, iterations, iteration_time, or_pathname)
 		or_routes = build_quick_routes(depot, parcels, travel, or_output)
 
 		return or_routes
 	else:
-		print("\nOR-Tools was unable to find a solution...\n")
+		print("\n OR-Tools was unable to find a solution...\n")

@@ -1,9 +1,9 @@
 ## Sample Variables
 depot_name = "EDINBURGH"
-sample_name = "sample_050"
+sample_name = "sample_143"
 
 ## Hard Constraints
-max_vans = 5
+max_vans = 8
 max_duty = 240
 service_time = 5
 departure_time = "10:00"
