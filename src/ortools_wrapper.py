@@ -26,7 +26,7 @@ def make_ortools_path(output_path):
 def get_time_matrix(travel):
 	df = travel.time
 	time = np.array(df.values.tolist())
-	time_mtx = time * 100  # Or_tools works best to large integers, so multiply every element by 100
+	time_mtx = time# * 100  # Or_tools works best to large integers, so multiply every element by 100
 	time_mtx = time_mtx.astype(int)
 	time_mtx = time_mtx.tolist()
 	return time_mtx
@@ -95,8 +95,8 @@ def print_solution(data, manager, routing, solution, postcode_df, iterations, it
 		slacks += slack
 
 		plan_output += 'Time of the route: {}mins\n'.format(int(route_distance / 100) + slack)
-		# print(plan_output)
-		# print(or_console_output)
+		print(plan_output)
+		print(or_console_output)
 		total_distance += route_distance
 
 	print("Number of Iterations: {}".format(iterations))
@@ -154,26 +154,25 @@ def run_or_tools(depot, parcels, travel, init_routes):
 	dimension_name = 'Time'
 	routing.AddDimension(
 		transit_callback_index,
-		1,  # no slack
-		params.max_duty * 10000,  # vehicle maximum travel distance
+		params.service_time,  # no slack
+		params.max_duty,  # vehicle maximum travel time
 		True,  # start cumul to zero
 		dimension_name)
 	distance_dimension = routing.GetDimensionOrDie(dimension_name)
-	distance_dimension.SetGlobalSpanCostCoefficient(1)
+	distance_dimension.SetGlobalSpanCostCoefficient(10)
 
-	# # Set default search parameters.
-	# search_parameters = pywrapcp.DefaultRoutingSearchParameters()
-	# search_parameters.solution_limit = params.num_ortools_iters
-	# search_parameters.local_search_metaheuristic = SEARCHES[params.search_ortools_options]
-	# search_parameters.log_search = True
-	#
-	# routing.CloseModelWithParameters(search_parameters)  # Close the model to allow the search parameter to take effect
+	# Set default search parameters.
+	search_parameters = pywrapcp.DefaultRoutingSearchParameters()
+	search_parameters.solution_limit = params.num_ortools_iters
+	search_parameters.local_search_metaheuristic = SEARCHES[params.search_ortools_options]
+	search_parameters.log_search = True
+
+	routing.CloseModelWithParameters(search_parameters)  # Close the model to allow the search parameter to take effect
 
 	initial_solution = routing.ReadAssignmentFromRoutes(data['initialise_routes'], True)
 
 	# Solve the problem.
-	# solution = routing.SolveFromAssignmentWithParameters(initial_solution, search_parameters)
-	solution = routing.Solve(initial_solution)
+	solution = routing.SolveFromAssignmentWithParameters(initial_solution, search_parameters)
 
 	end = timer()
 
@@ -183,9 +182,9 @@ def run_or_tools(depot, parcels, travel, init_routes):
 
 	# Print solution on console.
 	if solution:
-		# print("\n")
-		# print("OR-tools Solution after search:")
-		# print("\n")
+		print("\n")
+		print("OR-tools Solution after search:")
+		print("\n")
 		or_output = print_solution(data, manager, routing, solution, postcode_df, iterations, iteration_time, or_pathname)
 		or_routes = build_quick_routes(depot, parcels, travel, or_output)
 
