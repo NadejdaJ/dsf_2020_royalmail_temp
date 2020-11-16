@@ -20,6 +20,82 @@ class routes_class(object):
 		self.opexcost = None
 		self.stop_list = []
 
+	# remove consecutive hubs and ending hubs in stop_array
+	def remove_adjacent_hub(self, depot):
+		stop_array = np.array(self.stop_list)
+		stop_roll = np.roll(stop_array, -1)
+		myfilter = np.where(~((stop_array == stop_roll) & (stop_array == depot.postcode)))
+		self.stop_list = list(stop_array[myfilter])
+
+	# -----------------------------------------------------
+	# Pack list to routes
+	def fold_list_to_routes(self, depot):
+
+		# Number of separate vans
+		self.num_vans = self.stop_list.count(depot.postcode)
+		self.van_id = [(i + 1) for i in range(self.num_vans)]
+		self.van_stop_list = [[] for i in range(self.num_vans)]
+
+		stop_cnt = 0
+		route_cnt = 0
+
+		self.van_stop_list[route_cnt].append(depot.postcode)
+
+		for idx, stop in enumerate(self.stop_list[1:]):
+			stop_cnt += 1
+			self.van_stop_list[route_cnt].append(stop)
+
+			if stop == depot.postcode:
+				route_cnt += 1
+				self.van_stop_list[route_cnt].append(stop)
+
+		self.van_stop_list[route_cnt].append(depot.postcode)
+		assert (route_cnt + 1) == self.num_vans
+		return self.van_stop_list
+
+	# -----------------------------------------------------
+	# Unfold routes to list
+	def unfold_routes_to_list(self):
+		self.stop_list = [stops for subroute in self.van_stop_list for stops in subroute[:-1]]
+		return self.stop_list
+
+	# -----------------------------------------------------
+	# Evaluate routes cost
+	def compute_routes_cost(self, hub_table, matrix_time, matrix_dist):
+		# -----------------------------------------------------
+		# Initialisation of vans variables ...
+		self.van_times = [[0] for i in range(self.num_vans)]
+		self.van_distances = [[0] for i in range(self.num_vans)]
+		self.van_num_stops = [len(subroute) - 2 for subroute in self.van_stop_list]
+		# -----------------------------------------------------
+		# Adding time & distance to go to each drop, one van at a time...
+		for i in range(self.num_vans):
+			for j in range(self.van_num_stops[i]):
+				start = self.van_stop_list[i][j]
+				end = self.van_stop_list[i][j + 1]
+				self.van_times[i].append(
+					self.van_times[i][j] + matrix_time.loc[start, end] + params.service_time)
+				self.van_distances[i].append(self.van_distances[i][j] + matrix_dist.loc[start, end])
+
+		# Adding time & distance to go back to hub...
+		for m in range(self.num_vans):
+			n = self.van_num_stops[m]
+			start = self.van_stop_list[m][n]
+			end = hub_table.postcode
+			self.van_times[m].append(self.van_times[m][n] + matrix_time.loc[start, end])
+			self.van_distances[m].append(self.van_distances[m][n] + matrix_dist.loc[start, end])
+		# -----------------------------------------------------
+		tot_stops = self.routes_sumup()
+		# -----------------------------------------------------
+		# print(tot_stops, self.total_stops, sum(self.van_num_stops))
+		# -----------------------------------------------------
+		assert tot_stops == self.total_stops
+		# -----------------------------------------------------
+		self.compute_opexcost()
+		# -----------------------------------------------------
+
+	# -----------------------------------------------------
+
 	# Validity Rule for optimisation
 	def valid_routes_time(self):
 		if max([item[-1] for item in self.van_times]) > self.max_duty:
@@ -42,7 +118,10 @@ class routes_class(object):
 
 	# Parcel evaluation per van
 	def evaluate_parcel_cnt(self, parcel_per_stop):
-		self.van_num_parcels = [parcel_per_stop.loc[self.van_stop_list[i]].sum()[0] for i in range(self.num_vans)]
+		self.van_num_parcels = [0] * self.num_vans
+		for i, van in enumerate(self.van_stop_list):
+			for j, stop in enumerate(van[1:-1]):
+				self.van_num_parcels[i] += parcel_per_stop[stop]
 
 	# Validity Rule if needs to keep the Van number constant
 	def accept_routes_fixed_van_num(self):

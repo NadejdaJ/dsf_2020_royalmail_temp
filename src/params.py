@@ -10,8 +10,8 @@ departure_time = "10:00"
 
 ## OR-tools variables
 # Options available are: "GREEDY_DESCENT", "TABU_SEARCH", "GUIDED_LOCAL_SEARCH", "SIMULATED_ANNEALING"
-search_options = "GUIDED_LOCAL_SEARCH"
-num_iters = 20
+search_ortools_options = "GUIDED_LOCAL_SEARCH"
+num_ortools_iters = 20
 
 ## LNS Variable
 lns_destroy_frac = 0.4
