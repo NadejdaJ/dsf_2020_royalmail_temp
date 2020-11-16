@@ -41,6 +41,9 @@ def init_map(puzzle, map_name):
 	map_filename = map_path + "/" + map_name
 	fmap.save(map_filename)
 
+	return fmap
+
+
 def routes_map(puzzle, routes, map_name):
 
 	fmap = folium.Map(location=[puzzle.data.latitude.mean(), puzzle.data.longitude.mean()], zoom_start=params.zoom_level)
@@ -88,5 +91,7 @@ def routes_map(puzzle, routes, map_name):
 	map_path = puzzle.output_path + "/maps"
 	map_filename = map_path + "/" + map_name
 	fmap.save(map_filename)
+
+	return fmap
 
 

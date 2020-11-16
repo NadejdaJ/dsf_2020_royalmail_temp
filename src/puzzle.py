@@ -1,25 +1,26 @@
 import os
+import sys
 import pandas as pd
 import params
 
 class puzzle_class(object):
 
-	def __init__(self):
+	def __init__(self, input=params):
 		""" Data Access Paths """
 		self.input_path = None
 		self.output_path = None
 		""" Depot Properties """
 		self.depot_id = 'depot'
-		self.depot_name = params.depot_name
-		self.depot_sample = params.sample_name
+		self.depot_name = input.depot_name
+		self.depot_sample = input.sample_name
 		self.depot_postcode = None
 		self.depot_latitude = None
 		self.depot_longitude = None
 		""" Puzzle Constraints """
-		self.max_vans = params.max_vans
-		self.max_duty = params.max_duty
-		self.service_time = params.service_time
-		self.departure_time = params.departure_time
+		self.max_vans = input.max_vans
+		self.max_duty = input.max_duty
+		self.service_time = input.service_time
+		self.departure_time = input.departure_time
 		""" Puzzle Dataset """
 		self.load_dataset()
 		self.printout()
@@ -41,9 +42,9 @@ class puzzle_class(object):
 
 	def load_data_path(self):
 		# Path to load the puzzle dataset
-		self.input_path = "../data/input/" + params.depot_name + "/" + params.sample_name
+		self.input_path = "../data/input/" + self.depot_name + "/" + self.depot_sample + "/"
 		# Path to save the engine outputs
-		self.output_path = "../data/output/" + params.depot_name + "/" + params.sample_name
+		self.output_path = "../data/output/" + self.depot_name + "/" + self.depot_sample + "/"
 
 		if not os.path.exists(self.output_path):
 			os.makedirs(self.output_path)
@@ -54,6 +55,8 @@ class puzzle_class(object):
 				filename = os.path.join(self.input_path, fname)
 				data_df = pd.read_csv(filename, sep=",", index_col=0)
 				break
+		else:
+			sys.exit("\nNo Puzzle found in path %s\n" % self.input_path)
 		return data_df
 
 	def split_depot_to_parcel(self):
@@ -69,7 +72,7 @@ class puzzle_class(object):
 	def printout(self):
 
 		print("\nPuzzle Constraints:\n")
-		print("\t Depot Name:        %s" % params.depot_name)
+		print("\t Depot Name:        %s" % self.depot_name)
 		print("\t Depot Postcode:    %s" % self.depot_postcode)
 		print("\t Depot Latitude:    %s" % self.depot_latitude)
 		print("\t Depot Longitude:   %s" % self.depot_longitude)
