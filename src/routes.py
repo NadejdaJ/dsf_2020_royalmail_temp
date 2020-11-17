@@ -76,6 +76,57 @@ class routes_class(object):
 			tot_stops += self.van_num_stops[m]
 		return tot_stops
 
+	# -----------------------------------------------------
+	# remove consecutive depots in stop_list
+	def remove_adjacent_depots(self, puzzle):
+		stop_array = np.array(self.stop_list)
+		stop_roll = np.roll(stop_array, -1)
+		myfilter = np.where(~((stop_array == stop_roll) & (stop_array == puzzle.depot_id)))
+		self.stop_list = list(stop_array[myfilter])
+
+	# Unfold stop-list into vans
+	def update_vans_from_stop_list(self, puzzle):
+		# Drop empty vans
+		self.remove_adjacent_depots(puzzle)
+		# Number of separate vans
+		self.num_vans = self.stop_list.count(puzzle.depot_id)
+
+		stop_cnt = 0
+		route_cnt = 0
+
+		self.van_id = [(i + 1) for i in range(self.num_vans)]
+		self.van_stop_list = [[] for i in range(self.num_vans)]
+		self.van_stop_list[route_cnt].append(puzzle.depot_id)
+		self.van_times = [[0] for i in range(self.num_vans)]
+
+		for idx, stop in enumerate(self.stop_list[1:]):
+			stop_cnt += 1
+			previous = self.van_stop_list[route_cnt][-1]
+			self.van_times[route_cnt].append(self.van_times[route_cnt][-1]
+											 + puzzle.time_mtx.loc[previous, stop] + puzzle.service_time)
+			self.van_stop_list[route_cnt].append(stop)
+
+			if stop == puzzle.depot_id:
+				self.van_times[route_cnt][-1] -= puzzle.service_time
+				route_cnt += 1
+				self.van_stop_list[route_cnt].append(stop)
+
+		previous = self.van_stop_list[route_cnt][-1]
+		stop = puzzle.depot_id
+		self.van_times[route_cnt].append(self.van_times[route_cnt][-1] + puzzle.time_mtx.loc[previous, stop])
+		self.van_stop_list[route_cnt].append(puzzle.depot_id)
+
+		assert (route_cnt + 1) == self.num_vans
+
+		self.van_num_stops = [len(subroute) - 2 for subroute in self.van_stop_list]
+
+		assert self.routes_sumup() == self.total_stops
+
+	# Fold vans into stop-list
+	def update_stop_list_from_vans(self):
+		self.stop_list = [stops for subroute in self.van_stop_list for stops in subroute[:-1]]
+		return self.stop_list
+
 	# Initial random first set of routes
 	def build_at_random(self, puzzle, seed_val=12345):
 

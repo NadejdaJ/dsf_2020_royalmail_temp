@@ -33,15 +33,10 @@ def main():
 	init_routes.build_from_postcodes(puzzle)
 	routes_map(puzzle, init_routes, "init_routes_postcodes.html")
 
-	current_time = utils.mytimeprint(current_time, start_time)
-	print("\n##################################################################\n")
-	print("\t...Input Routes...\n")
+	print("\n\t...Input Solution...\n")
 	init_routes.print_route_stats()
 
 	current_time = utils.mytimeprint(current_time, start_time)
-
-	sys.exit()
-
 	print("\n##################################################################\n")
 	print("\t...Running OR-tools solver...")
 
@@ -56,12 +51,12 @@ def main():
 
 	current_time = utils.mytimeprint(current_time, start_time)
 
-	print("\n##################################################################\n")
-	print("\t...Running our own LNS solver...\n")
+	# print("\n##################################################################\n")
+	# print("\t...Running our own LNS solver...\n")
 
 	# final_route = vrp_solver(init_routes)
 
-	current_time = utils.mytimeprint(current_time, start_time)
+	# current_time = utils.mytimeprint(current_time, start_time)
 	print("\n##################################################################\n")
 	end_date = datetime.now()
 	print("-----\nVRP engine ran on the %02d-%02d-%4d\n" % (start_date.day, start_date.month, start_date.year))

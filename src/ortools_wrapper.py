@@ -23,46 +23,41 @@ def make_ortools_path(output_path):
 		os.makedirs(or_pathname)
 	return or_pathname
 
-def get_time_matrix(travel):
-	df = travel.time
-	time = np.array(df.values.tolist())
-	time_mtx = time# * 100  # Or_tools works best to large integers, so multiply every element by 100
-	time_mtx = time_mtx.astype(int)
-	time_mtx = time_mtx.tolist()
-	return time_mtx
+def get_time_matrix(puzzle):
+	# Or_tools works best to large integers, so multiply every element by 100
+	time_mtx = np.array(puzzle.time_mtx.values.tolist()) * 100
+	time_mtx = np.where(time_mtx != 0, time_mtx + puzzle.service_time * 100, 0)
+	time_mtx[1:,0] -= puzzle.service_time * 100
+	return time_mtx.astype(int).tolist()
 
-def get_stop_postcodes(depot, parcels):
-	df = parcels.data
-	h_p = depot.postcode
-	df = df[['postcode']]
-	df.loc[-1] = [h_p]  # adding a row
+def get_stop_postcodes(puzzle):
+	df = puzzle.data.reset_index()
+	df = df[['id']]
+	df.loc[-1] = [puzzle.depot_id]  # adding a row
 	df.index = df.index + 1  # shifting index
 	df = df.sort_index()  # sorting by index
-	duplicate_stops = df[df['postcode'].duplicated()]['postcode'].tolist()
-	# saveList(duplicate_dps, "duplicate_dp.npy")
-	df = df.drop_duplicates(['postcode'])
 	df = df.reset_index(drop=True)
-	return df, duplicate_stops
+	return df
 
-def create_data_model(depot, parcels, travel, init_routes):
+def create_data_model(puzzle, init_routes):
 	"""Stores the data for the problem."""
-	time_mtx = get_time_matrix(travel)
+	time_mtx = get_time_matrix(puzzle)
 
-	in_list = init_routes.stop_list[:]
-	no_hub = init_routes.van_stop_list
-	no_hub = [x[1:-1] for x in no_hub]
-	data_df = parcels.data
-	initial_route = [[data_df[data_df['postcode'] == x].index.values[0] for x in xs] for xs in no_hub]
-	initial_route = [list(set(tuple(i))) for i in initial_route]
+	no_hub = [x[1:-1] for x in init_routes.van_stop_list]
 
-	df, duplicate = get_stop_postcodes(depot, parcels)
+	data_df = puzzle.data.reset_index()
+
+	init_route = [[data_df[data_df.id == x].index.values[0] for x in xs] for xs in no_hub]
+	init_route = [list(set(tuple(i))) for i in init_route]
+
+	ids_df = get_stop_postcodes(puzzle)
 
 	data = {'time_matrix': time_mtx,
-			'initialise_routes': initial_route,
-			'num_vehicles': depot.num_vans,
+			'initialise_routes': init_route,
+			'num_vehicles': puzzle.max_vans,
 			'depot': 0}
 
-	return data, df
+	return data, ids_df
 
 def saveList(mylist, filename):
 	# the filename should mention the extension 'npy'
@@ -76,7 +71,7 @@ def print_solution(data, manager, routing, solution, postcode_df, iterations, it
 		index = routing.Start(vehicle_id)
 		plan_output = 'Route for vehicle {}:\n'.format(vehicle_id)
 		or_console_output = 'Route for vehicle {}:\n'.format(vehicle_id)
-		route_distance = 0
+		route_metric = 0
 		count = 0
 		while not routing.IsEnd(index):
 			plan_output += ' {} -> '.format(manager.IndexToNode(index))
@@ -86,23 +81,23 @@ def print_solution(data, manager, routing, solution, postcode_df, iterations, it
 			# output to be reconstructed
 			previous_index = index
 			index = solution.Value(routing.NextVar(index))
-			route_distance += routing.GetArcCostForVehicle(
-				previous_index, index, vehicle_id)
+			route_metric += routing.GetArcCostForVehicle(previous_index, index, vehicle_id)
 			count += 1
 		plan_output += '{}\n'.format(manager.IndexToNode(index))
 		or_console_output += '{}\n'.format(postcode_df.loc[manager.IndexToNode(index)].values[0])
-		slack = (count - 1) * 2
-		slacks += slack
 
-		plan_output += 'Time of the route: {}mins\n'.format(int(route_distance / 100) + slack)
+		# slack = params.service_time
+		slack = 0
+
+		plan_output += 'Time of the route: {}mins\n'.format(int(route_metric / 100) + slack)
 		print(plan_output)
 		print(or_console_output)
-		total_distance += route_distance
+		total_distance += int(route_metric / 100) + slack
 
 	print("Number of Iterations: {}".format(iterations))
 	print("Iterations duration: {} seconds".format(int(iteration_time)))
 	print("Time per iteration(sec/iter): {} ".format(iteration_time / iterations))
-	print('Time for entire route: {}mins'.format(int(total_distance / 100) + slacks))
+	print('Time for entire route: {}mins'.format(int(total_distance)))
 
 	# Save the metrics to be used in constructing the plots
 	saveList([iterations, iteration_time, iteration_time / iterations], or_pathname + "/metrics.npy")
@@ -112,24 +107,21 @@ def print_solution(data, manager, routing, solution, postcode_df, iterations, it
 	return or_file_ouput
 
 
-def build_quick_routes(depot, parcels, traffic, input_list):
+def build_quick_routes(puzzle, input_list):
 	# Build class from input list
-	input_routes = routes_class(parcels)
+	input_routes = routes_class(puzzle)
 	input_routes.stop_list = input_list[:]
-	input_routes.remove_adjacent_hub(depot)
-	input_routes.fold_list_to_routes(depot)
-	input_routes.compute_routes_cost(depot, traffic.time, traffic.dist)
-	input_routes.evaluate_parcel_cnt(parcels.parcel_per_stop)
+	input_routes.update_vans_from_stop_list(puzzle)
 
 	return input_routes
 
-def run_or_tools(depot, parcels, travel, init_routes):
+def run_or_tools(puzzle, init_routes):
 	start = timer()
 
-	or_pathname = make_ortools_path(depot.output_path)
+	or_pathname = make_ortools_path(puzzle.output_path)
 
 	# Instantiate the data problem.
-	data, postcode_df = create_data_model(depot, parcels, travel, init_routes)
+	data, postcode_df = create_data_model(puzzle, init_routes)
 
 	# Create the routing index manager.
 	manager = pywrapcp.RoutingIndexManager(len(data['time_matrix']), data['num_vehicles'], data['depot'])
@@ -154,12 +146,12 @@ def run_or_tools(depot, parcels, travel, init_routes):
 	dimension_name = 'Time'
 	routing.AddDimension(
 		transit_callback_index,
-		params.service_time,  # no slack
-		params.max_duty,  # vehicle maximum travel time
+		0,  # no slack
+		puzzle.max_duty * 100,  # vehicle maximum travel time
 		True,  # start cumul to zero
 		dimension_name)
 	distance_dimension = routing.GetDimensionOrDie(dimension_name)
-	distance_dimension.SetGlobalSpanCostCoefficient(10)
+	distance_dimension.SetGlobalSpanCostCoefficient(0)
 
 	# Set default search parameters.
 	search_parameters = pywrapcp.DefaultRoutingSearchParameters()
@@ -186,7 +178,7 @@ def run_or_tools(depot, parcels, travel, init_routes):
 		print("OR-tools Solution after search:")
 		print("\n")
 		or_output = print_solution(data, manager, routing, solution, postcode_df, iterations, iteration_time, or_pathname)
-		or_routes = build_quick_routes(depot, parcels, travel, or_output)
+		or_routes = build_quick_routes(puzzle, or_output)
 
 		return or_routes
 	else:

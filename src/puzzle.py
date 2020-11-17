@@ -38,7 +38,7 @@ class puzzle_class(object):
 		self.time_mtx = self.load_data_file(suffix)
 		# Reading the *distance* travel matrix
 		suffix = "distance.csv"
-		self.time_mtx = self.load_data_file(suffix)
+		self.distance_mtx = self.load_data_file(suffix)
 
 	def load_data_path(self):
 		# Path to load the puzzle dataset
@@ -78,5 +78,6 @@ class puzzle_class(object):
 		print("\t Depot Longitude:   %s" % self.depot_longitude)
 		print("\t Depot Max Fleet:   %s" % self.max_vans)
 		print("\t Depot Max Duty:    %s [min]" % self.max_duty)
+		print("\t Depot Service:     %s [min]" % self.service_time)
 		print("\nDelivery Points Coordinates:\n")
 		print(self.data)
