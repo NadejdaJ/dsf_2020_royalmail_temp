@@ -130,6 +130,8 @@ class routes_class(object):
 	# Initial random first set of routes
 	def build_at_random(self, puzzle, seed_val=12345):
 
+		print("\n Initialisation of Routes at Random...")
+
 		self.routes_start_at_hub(puzzle.depot_id)
 
 		stop_list = puzzle.stop_list[:]
@@ -156,6 +158,8 @@ class routes_class(object):
 		self.routes_end_at_hub(puzzle)
 
 		assert self.routes_sumup() == self.total_stops
+
+		self.update_stop_list_from_vans()
 
 	# Initial postcode-sector split set of routes
 	def build_from_postcodes(self, puzzle):
@@ -187,6 +191,8 @@ class routes_class(object):
 		self.routes_end_at_hub(puzzle)
 
 		assert self.routes_sumup() == self.total_stops
+
+		self.update_stop_list_from_vans()
 
 	def print_route_stats(self):
 		print("\t---------")

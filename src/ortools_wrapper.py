@@ -90,14 +90,14 @@ def print_solution(data, manager, routing, solution, postcode_df, iterations, it
 		slack = 0
 
 		plan_output += 'Time of the route: {}mins\n'.format(int(route_metric / 100) + slack)
-		print(plan_output)
-		print(or_console_output)
+		# print(plan_output)
+		# print(or_console_output)
 		total_distance += int(route_metric / 100) + slack
 
-	print("Number of Iterations: {}".format(iterations))
-	print("Iterations duration: {} seconds".format(int(iteration_time)))
-	print("Time per iteration(sec/iter): {} ".format(iteration_time / iterations))
-	print('Time for entire route: {}mins'.format(int(total_distance)))
+	# print("Number of Iterations: {}".format(iterations))
+	# print("Iterations duration: {} seconds".format(int(iteration_time)))
+	# print("Time per iteration(sec/iter): {} ".format(iteration_time / iterations))
+	# print('Time for entire route: {}mins'.format(int(total_distance)))
 
 	# Save the metrics to be used in constructing the plots
 	saveList([iterations, iteration_time, iteration_time / iterations], or_pathname + "/metrics.npy")
@@ -151,7 +151,7 @@ def run_or_tools(puzzle, init_routes):
 		True,  # start cumul to zero
 		dimension_name)
 	distance_dimension = routing.GetDimensionOrDie(dimension_name)
-	distance_dimension.SetGlobalSpanCostCoefficient(0)
+	distance_dimension.SetGlobalSpanCostCoefficient(params.spancost_coeff)
 
 	# Set default search parameters.
 	search_parameters = pywrapcp.DefaultRoutingSearchParameters()
@@ -174,12 +174,13 @@ def run_or_tools(puzzle, init_routes):
 
 	# Print solution on console.
 	if solution:
-		print("\n")
-		print("OR-tools Solution after search:")
-		print("\n")
+		# print("\n")
+		# print("OR-tools Solution after search:")
+		# print("\n")
 		or_output = print_solution(data, manager, routing, solution, postcode_df, iterations, iteration_time, or_pathname)
 		or_routes = build_quick_routes(puzzle, or_output)
 
 		return or_routes
 	else:
 		print("\n OR-Tools was unable to find a solution...\n")
+		return init_routes

@@ -26,10 +26,6 @@ def main():
 	print("\t...Building Initial Routes...")
 
 	init_routes = routes_class(puzzle)
-
-	init_routes.build_at_random(puzzle)
-	routes_map(puzzle, init_routes, "init_routes_random.html")
-
 	init_routes.build_from_postcodes(puzzle)
 	routes_map(puzzle, init_routes, "init_routes_postcodes.html")
 
@@ -38,7 +34,7 @@ def main():
 
 	current_time = utils.mytimeprint(current_time, start_time)
 	print("\n##################################################################\n")
-	print("\t...Running OR-tools solver...")
+	print("\t...Running OR-tools solver...\n")
 
 	or_routes= run_or_tools(puzzle, init_routes)
 
