@@ -20,7 +20,7 @@ class routes_class(object):
 	def __init__(self, puzzle):
 		self.num_vans = puzzle.max_vans
 		self.max_duty = puzzle.max_duty
-		self.total_stops = puzzle.num_stops
+		self.num_stops = puzzle.num_stops
 		self.total_time = None
 		self.stop_list = []
 
@@ -120,7 +120,7 @@ class routes_class(object):
 
 		self.van_num_stops = [len(subroute) - 2 for subroute in self.van_stop_list]
 
-		assert self.routes_sumup() == self.total_stops
+		assert self.routes_sumup() == self.num_stops
 
 	# Fold vans into stop-list
 	def update_stop_list_from_vans(self):
@@ -157,7 +157,7 @@ class routes_class(object):
 
 		self.routes_end_at_hub(puzzle)
 
-		assert self.routes_sumup() == self.total_stops
+		assert self.routes_sumup() == self.num_stops
 
 		self.update_stop_list_from_vans()
 
@@ -168,7 +168,7 @@ class routes_class(object):
 
 		self.routes_start_at_hub(puzzle.depot_id)
 
-		avg_deliveries_per_van = int(ceil(self.total_stops / self.num_vans))
+		avg_deliveries_per_van = int(ceil(self.num_stops / self.num_vans))
 
 		stop_list = puzzle.data.postcode.str.replace(" ","").apply\
 			(lambda x: zeros_padding_to_number_digits(x)).sort_values().index.tolist()
@@ -190,14 +190,14 @@ class routes_class(object):
 
 		self.routes_end_at_hub(puzzle)
 
-		assert self.routes_sumup() == self.total_stops
+		assert self.routes_sumup() == self.num_stops
 
 		self.update_stop_list_from_vans()
 
 	def print_route_stats(self):
 		print("\t---------")
 		print('\tNumber of Vans    =', self.num_vans)
-		print('\tNumber of Stops   =', self.total_stops)
+		print('\tNumber of Stops   =', self.num_stops)
 		print("\t---------")
 		for m in range(self.num_vans):
 			print('\t\tVan', self.van_id[m],
