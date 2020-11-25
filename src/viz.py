@@ -56,7 +56,7 @@ def routes_map(puzzle, routes, map_name):
 
 	line0 = '<div style="font-size: 11pt"> -------------------------------'
 	line1 = '<div style="font-size: 11pt"> Number of Vans    =  %d </div>' % (routes.num_vans)
-	line2 = '<div style="font-size: 11pt"> Number of Stops   =  %d </div>' % (routes.total_stops)
+	line2 = '<div style="font-size: 11pt"> Number of Stops   =  %d </div>' % (routes.num_stops)
 	line3 = '<div style="font-size: 11pt"> Total Time        =  %.f [min] </div>' % (routes.total_time)
 	line4 = '<div style="font-size: 11pt"> Route Evaluation  =  %s </div>'%(routes.evaluate_routes_time())
 
