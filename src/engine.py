@@ -5,6 +5,7 @@ import utils
 from puzzle import puzzle_class
 from routes import routes_class
 from ortools_wrapper import run_or_tools
+from vrp_solver import run_vrp_solver
 
 from viz import init_map, routes_map
 
@@ -47,12 +48,12 @@ def main():
 
 	current_time = utils.mytimeprint(current_time, start_time)
 
-	# print("\n##################################################################\n")
-	# print("\t...Running our own LNS solver...\n")
+	print("\n##################################################################\n")
+	print("\t...Running our own LNS solver...\n")
 
-	# final_route = vrp_solver(init_routes)
+	final_route = run_vrp_solver(init_routes)
 
-	# current_time = utils.mytimeprint(current_time, start_time)
+	current_time = utils.mytimeprint(current_time, start_time)
 	print("\n##################################################################\n")
 	end_date = datetime.now()
 	print("-----\nVRP engine ran on the %02d-%02d-%4d\n" % (start_date.day, start_date.month, start_date.year))
