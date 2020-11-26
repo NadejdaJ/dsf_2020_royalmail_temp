@@ -4,7 +4,7 @@ from datetime import datetime
 import utils
 from puzzle import puzzle_class
 from routes import routes_class
-from ortools_wrapper import run_or_tools
+from ortools_solver import run_or_tools
 from vrp_solver import run_vrp_solver
 
 from viz import init_map, routes_map
@@ -34,9 +34,9 @@ def main():
     init_routes.print_route_stats()
 
     current_time = utils.mytimeprint(current_time, start_time)
+
     print("\n##################################################################\n")
     print("\t...Running OR-tools solver...\n")
-
     or_routes= run_or_tools(puzzle, init_routes)
 
     routes_map(puzzle, or_routes, "ortools_routes_solution.html")
@@ -54,6 +54,11 @@ def main():
     final_route, record_perf_df = run_vrp_solver(puzzle, init_routes)
 
     current_time = utils.mytimeprint(current_time, start_time)
+
+    print("\n##################################################################\n")
+
+    print("\n\t...Input Solution...\n")
+    final_route.print_route_stats()
 
     print("\n##################################################################\n")
     end_date = datetime.now()

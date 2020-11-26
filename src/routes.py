@@ -8,6 +8,7 @@ import copy
 from math import ceil
 import params
 
+
 def zeros_padding_to_number_digits(mystring):
 	"""
 	Returns all numbers on 5 digits to let sort the string with numeric order.
@@ -26,12 +27,72 @@ class routes_class(object):
 
 	# -----------------------------------------------------
 
-	# Validity Rule for optimisation
-	def valid_routes_time(self):
-		if max([item[-1] for item in self.van_times]) > self.max_duty:
-			return False
-		else:
-			return True
+	# Initial random first set of routes
+	def build_at_random(self, puzzle, seed_val=12345):
+
+		print("\n Initialisation of Routes at Random...")
+
+		self.routes_start_at_hub(puzzle.depot_id)
+
+		stop_list = puzzle.stop_list[:]
+		list_left = len(stop_list)
+
+		rnd.seed(seed_val)
+		rnd.shuffle(stop_list)
+
+		m = n = 0
+		while list_left:
+
+			start = self.van_stop_list[m][n]
+			end = stop_list.pop(0)
+
+			self.routes_append_postcode(puzzle, m, n, start, end)
+
+			m = m + 1
+			if m == self.num_vans:
+				m = 0
+				n = n + 1
+
+			list_left -= 1
+
+		self.routes_end_at_hub(puzzle)
+
+		assert self.routes_sumup() == self.num_stops
+
+		self.update_stop_list_from_vans()
+
+	# Initial postcode-sector split set of routes
+	def build_from_postcodes(self, puzzle):
+
+		print("\n Initialisation of Routes from Sorted Postcodes...")
+
+		self.routes_start_at_hub(puzzle.depot_id)
+
+		avg_deliveries_per_van = int(ceil(self.num_stops / self.num_vans))
+
+		stop_list = puzzle.data.postcode.str.replace(" ","").apply\
+			(lambda x: zeros_padding_to_number_digits(x)).sort_values().index.tolist()
+		list_left = len(stop_list)
+
+		m = n = 0
+		while list_left:
+			start = self.van_stop_list[m][n]
+			end = stop_list.pop(0)
+
+			self.routes_append_postcode(puzzle, m, n, start, end)
+
+			n += 1
+			if n == avg_deliveries_per_van:
+				n = 0
+				m += 1
+
+			list_left -= 1
+
+		self.routes_end_at_hub(puzzle)
+
+		assert self.routes_sumup() == self.num_stops
+
+		self.update_stop_list_from_vans()
 
 	# Validity Rule for optimisation
 	def evaluate_routes_time(self):
@@ -126,73 +187,6 @@ class routes_class(object):
 	def update_stop_list_from_vans(self):
 		self.stop_list = [stops for subroute in self.van_stop_list for stops in subroute[:-1]]
 		return self.stop_list
-
-	# Initial random first set of routes
-	def build_at_random(self, puzzle, seed_val=12345):
-
-		print("\n Initialisation of Routes at Random...")
-
-		self.routes_start_at_hub(puzzle.depot_id)
-
-		stop_list = puzzle.stop_list[:]
-		list_left = len(stop_list)
-
-		rnd.seed(seed_val)
-		rnd.shuffle(stop_list)
-
-		m = n = 0
-		while list_left:
-
-			start = self.van_stop_list[m][n]
-			end = stop_list.pop(0)
-
-			self.routes_append_postcode(puzzle, m, n, start, end)
-
-			m = m + 1
-			if m == self.num_vans:
-				m = 0
-				n = n + 1
-
-			list_left -= 1
-
-		self.routes_end_at_hub(puzzle)
-
-		assert self.routes_sumup() == self.num_stops
-
-		self.update_stop_list_from_vans()
-
-	# Initial postcode-sector split set of routes
-	def build_from_postcodes(self, puzzle):
-
-		print("\n Initialisation of Routes from Sorted Postcodes...")
-
-		self.routes_start_at_hub(puzzle.depot_id)
-
-		avg_deliveries_per_van = int(ceil(self.num_stops / self.num_vans))
-
-		stop_list = puzzle.data.postcode.str.replace(" ","").apply\
-			(lambda x: zeros_padding_to_number_digits(x)).sort_values().index.tolist()
-		list_left = len(stop_list)
-
-		m = n = 0
-		while list_left:
-			start = self.van_stop_list[m][n]
-			end = stop_list.pop(0)
-
-			self.routes_append_postcode(puzzle, m, n, start, end)
-
-			n += 1
-			if n == avg_deliveries_per_van:
-				n = 0
-				m += 1
-
-			list_left -= 1
-
-		self.routes_end_at_hub(puzzle)
-
-		assert self.routes_sumup() == self.num_stops
-
-		self.update_stop_list_from_vans()
 
 	def print_route_stats(self):
 		print("\t---------")

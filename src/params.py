@@ -12,7 +12,7 @@ departure_time = "10:00"
 # Options available are: "GREEDY_DESCENT", "TABU_SEARCH", "GUIDED_LOCAL_SEARCH", "SIMULATED_ANNEALING"
 search_ortools_options = "SIMULATED_ANNEALING"
 num_ortools_iters = 100
-spancost_coeff = 10
+spancost_coeff = 100
 
 ## LNS Variable
 lns_destroy_frac = 0.4
