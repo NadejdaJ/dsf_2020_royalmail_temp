@@ -111,6 +111,7 @@ def plot_travel_data_distributions(puzzle, fig_name):
 	if not os.path.exists(fig_path):
 		os.makedirs(fig_path)
 	fig_filename = fig_path + "/" + fig_name
+
 	plt.savefig(fig_filename)
 
 def plot_travel_metric_scatter(puzzle, fig_name):
@@ -124,10 +125,11 @@ def plot_travel_metric_scatter(puzzle, fig_name):
 	if not os.path.exists(fig_path):
 		os.makedirs(fig_path)
 	fig_filename = fig_path + "/" + fig_name
+
 	plt.savefig(fig_filename)
 
 def plot_convergence_cost(puzzle, record_perf_df, fig_name):
-	figure = plt.figure(figsize=(10, 6))
+	plt.figure(figsize=(10, 6))
 	plt.grid()
 	plt.plot(record_perf_df.iter, record_perf_df.route_cost, color='blue', label='route cost')
 	plt.plot(record_perf_df.iter, record_perf_df.best_cost, color='red', label='best cost')
@@ -140,4 +142,5 @@ def plot_convergence_cost(puzzle, record_perf_df, fig_name):
 	if not os.path.exists(fig_path):
 		os.makedirs(fig_path)
 	fig_filename = fig_path + "/" + fig_name
+
 	plt.savefig(fig_filename)
