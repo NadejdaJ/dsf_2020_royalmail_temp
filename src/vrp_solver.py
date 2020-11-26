@@ -1,46 +1,53 @@
+import pandas as pd
+import random as rnd
+from math import exp, log
 import params
 import lns
 import routes
-import random as rnd
-from math import exp, log
 
+def random_chance_of_accepting(repaired_routes, tmp_route, SA_Temp):
+    prob = exp(-(repaired_routes.total_time - tmp_route.total_time) / SA_Temp)
+    if rnd.uniform(0, 1) < prob:
+        return True
+    return False
 
-def run_vrp_solver(init_route):
+def run_vrp_solver(puzzle, init_route):
+    record_perf_df = pd.DataFrame()
+
     sa_iter_count = 0
-    best_route = init_route.deepcopy()
-    tmp_route = init_route.deepcopy()
-    SA_Temp = (1 - params.sa_control_temp) * tmp_route.cost / log(0.5)
+    best_route = init_route
+    tmp_route = init_route
+    SA_Temp = (1 - params.sa_control_temp) * tmp_route.total_time / log(0.5)
 
     while sa_iter_count <= params.sa_max_iter:
         sa_iter_count += 1
         print("Running optimisation of route")
         ### Run lns
-        #ToDo: Insert Hugos lns
         repaired_routes = lns.run(tmp_route)
-        repaired_route_cost = repaired_routes.cost
 
         ### Reject route if wrong
-        #ToDo: reject route if wrong based on to few vans & above 240min
+        if repaired_routes.num_vans != puzzle.max_vans:
+            pass
+        if repaired_routes.total_time > puzzle.max_duty:
+            pass
 
         ### Simulated Annealing
-        #Todo: Correct pseudocode below
-        flag_accept = False
-
-        prob = exp(-(repaired_routes.opexcost - repaired_routes.opexcost) / SA_Temp)
-        if rnd.uniform(0, 1) < prob:
-            random_chance_of_accepting = True
-        else:
-            random_chance_of_accepting = False
+        if repaired_routes.total_time < best_route.total_time:
+            best_route = repaired_routes
             tmp_route = repaired_routes
-        if repaired_routes < best_route.cost:
-            flag_accept = True
-            #ToDo: set best route to temp route
+        elif random_chance_of_accepting(repaired_routes, tmp_route, SA_Temp):
+            tmp_route = repaired_routes
 
-        elif random_chance_of_accepting:
-            flag_accept = True
+        ### Keep track for graphs
+        perf_dict = {"iter": sa_iter_count,
+                     "SA_temp": SA_Temp,
+                     "route_cost": tmp_route.total_time,
+                     "best_cost": best_route.total_time}
+        record_perf_df = record_perf_df.append(pd.DataFrame(perf_dict, index=[0]))
+
         ### Updating Simulated Annealing Temperature for next iteration
         SA_Temp = params.sa_cooling_rate * SA_Temp
 
-        ### Keep track for graphs
+    record_perf_df = record_perf_df.reset_index(drop=True)
 
-    return best_route
+    return best_route, record_perf_df
