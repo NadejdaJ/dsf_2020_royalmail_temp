@@ -26,8 +26,6 @@ class routes_class(object):
 		self.total_time = None
 		self.stop_list = []
 
-	# -----------------------------------------------------
-
 	# Initial random first set of routes
 	def build_at_random(self, puzzle, seed_val=12345):
 
@@ -152,7 +150,6 @@ class routes_class(object):
 			tot_stops += self.van_num_stops[m]
 		return tot_stops
 
-	# -----------------------------------------------------
 	# remove consecutive depots in stop_list
 	def remove_adjacent_depots(self, puzzle):
 		stop_array = np.array(self.stop_list)

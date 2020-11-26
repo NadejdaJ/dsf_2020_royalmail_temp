@@ -1,7 +1,8 @@
+import os
 import re
 import time
-from more_itertools import unique_everseen
 import routes
+import pickle
 
 def mytime(tstamp):
 	return round(time.time() - tstamp, 2)
@@ -24,3 +25,16 @@ def build_quick_routes(puzzle, input_list):
 	input_routes.update_vans_from_stop_list(puzzle)
 
 	return input_routes
+
+def pickle_route_class(puzzle, route, filename):
+	# load file name and path
+	pathname = puzzle.output_path + "/solutions"
+	if not os.path.exists(pathname):
+		os.makedirs(pathname)
+	picklename = pathname + "/" + filename
+	# create a pickle file
+	picklefile = open(picklename, 'wb')
+	# pickle the route and write it to file
+	pickle.dump(route, picklefile)
+	# close the file
+	picklefile.close()

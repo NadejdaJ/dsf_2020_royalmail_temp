@@ -3,6 +3,7 @@ import folium
 from folium.features import DivIcon
 from datetime import datetime, timedelta
 import params
+import matplotlib.pyplot as plt
 
 coloricons_choices = [
 	'red', 'blue', 'green', 'orange', 'purple', 'pink', 'cadetblue', 'darkred', 'darkblue',
@@ -94,4 +95,49 @@ def routes_map(puzzle, routes, map_name):
 
 	return fmap
 
+def plot_travel_data_distributions(puzzle, fig_name):
+	fig, (ax1, ax2) = plt.subplots(nrows=1, ncols=2, figsize=(15, 7))
+	ax1.hist(puzzle.time_mtx.values.flatten(), 20)
+	ax1.set_xlabel('Time (min)')
+	ax1.set_ylabel('Count')
+	ax1.set_title(r'Distribution of times A -> B')
 
+	ax2.hist(puzzle.distance_mtx.values.flatten(), 20)
+	ax2.set_xlabel('Distance (km)')
+	ax2.set_ylabel('Count')
+	ax2.set_title(r'Distribution of distances A -> B')
+
+	fig_path = puzzle.output_path + "/figs"
+	if not os.path.exists(fig_path):
+		os.makedirs(fig_path)
+	fig_filename = fig_path + "/" + fig_name
+	plt.savefig(fig_filename)
+
+def plot_travel_metric_scatter(puzzle, fig_name):
+	fig, ax = plt.subplots(figsize=(15, 7))
+	ax.scatter(puzzle.time_mtx.values.flatten(), puzzle.distance_mtx.values.flatten())
+	ax.set_xlabel('Time (min)')
+	ax.set_ylabel('Distance (Km)')
+	ax.set_title(r'Travel data relationship')
+
+	fig_path = puzzle.output_path + "/figs"
+	if not os.path.exists(fig_path):
+		os.makedirs(fig_path)
+	fig_filename = fig_path + "/" + fig_name
+	plt.savefig(fig_filename)
+
+def plot_convergence_cost(puzzle, record_perf_df, fig_name):
+	figure = plt.figure(figsize=(10, 6))
+	plt.grid()
+	plt.plot(record_perf_df.iter, record_perf_df.route_cost, color='blue', label='route cost')
+	plt.plot(record_perf_df.iter, record_perf_df.best_cost, color='red', label='best cost')
+	plt.title('Search Convergence')
+	plt.xlabel('Number of iterations')
+	plt.ylabel('Total time of routes')
+	plt.legend()#loc='center right', bbox_to_anchor=(0.95, 1.05))
+
+	fig_path = puzzle.output_path + "/figs"
+	if not os.path.exists(fig_path):
+		os.makedirs(fig_path)
+	fig_filename = fig_path + "/" + fig_name
+	plt.savefig(fig_filename)

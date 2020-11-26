@@ -1,7 +1,5 @@
-import sys
 import os
 import numpy as np
-import pandas as pd
 
 import params
 
@@ -9,6 +7,7 @@ from ortools.constraint_solver import pywrapcp, routing_enums_pb2
 from timeit import default_timer as timer
 
 from routes import routes_class
+from utils import build_quick_routes
 
 SEARCHES = {
 	'GREEDY_DESCENT': routing_enums_pb2.LocalSearchMetaheuristic.GREEDY_DESCENT,
@@ -17,8 +16,8 @@ SEARCHES = {
 	'SIMULATED_ANNEALING': routing_enums_pb2.LocalSearchMetaheuristic.SIMULATED_ANNEALING
 }
 
-def make_ortools_path(output_path):
-	or_pathname = output_path + "/ortools"
+def load_ortools_path(output_path):
+	or_pathname = output_path + "/solutions"
 	if not os.path.exists(or_pathname):
 		os.makedirs(or_pathname)
 	return or_pathname
@@ -99,25 +98,17 @@ def print_solution(data, manager, routing, solution, postcode_df, iterations, it
 	# print('Time for entire route: {}mins'.format(int(total_distance)))
 
 	# Save the metrics to be used in constructing the plots
-	saveList([iterations, iteration_time, iteration_time / iterations], or_pathname + "/metrics.npy")
+	saveList([iterations, iteration_time, iteration_time / iterations], or_pathname + "/ortools_metrics.npy")
 	# Save the list that will be used as the constructed route
-	saveList(or_file_ouput, or_pathname + "/or_file_output.npy")
+	saveList(or_file_ouput, or_pathname + "/ortools_output.npy")
 
 	return or_file_ouput
 
-
-def build_quick_routes(puzzle, input_list):
-	# Build class from input list
-	input_routes = routes_class(puzzle)
-	input_routes.stop_list = input_list[:]
-	input_routes.update_vans_from_stop_list(puzzle)
-
-	return input_routes
-
+# -----------------------
 def run_or_tools(puzzle, init_routes):
 	start = timer()
 
-	or_pathname = make_ortools_path(puzzle.output_path)
+	or_pathname = load_ortools_path(puzzle.output_path)
 
 	# Instantiate the data problem.
 	data, postcode_df = create_data_model(puzzle, init_routes)
@@ -173,9 +164,6 @@ def run_or_tools(puzzle, init_routes):
 
 	# Print solution on console.
 	if solution:
-		# print("\n")
-		# print("OR-tools Solution after search:")
-		# print("\n")
 		or_output = print_solution(data, manager, routing, solution, postcode_df, iterations, iteration_time, or_pathname)
 		or_routes = build_quick_routes(puzzle, or_output)
 

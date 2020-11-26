@@ -1,13 +1,12 @@
 import sys
 import time
 from datetime import datetime
-import utils
 from puzzle import puzzle_class
 from routes import routes_class
 from ortools_solver import run_or_tools
 from vrp_solver import run_vrp_solver
-
-from viz import init_map, routes_map
+import utils
+import viz
 
 def main():
 
@@ -19,7 +18,7 @@ def main():
 
     puzzle = puzzle_class()
 
-    init_map(puzzle, "delivery_point_locations.html")
+    viz.init_map(puzzle, "delivery_point_locations.html")
 
     current_time = utils.mytimeprint(start_time, start_time)
 
@@ -27,40 +26,50 @@ def main():
     print("\t...Building Initial Routes...")
 
     init_routes = routes_class(puzzle)
+
     init_routes.build_from_postcodes(puzzle)
     # init_routes.build_at_random(puzzle)
-    routes_map(puzzle, init_routes, "init_routes_postcodes.html")
+
+    viz.routes_map(puzzle, init_routes, "init_routes_postcodes.html")
 
     print("\n\t...Inital Solution...\n")
     init_routes.print_route_stats()
 
     current_time = utils.mytimeprint(current_time, start_time)
 
-    # print("\n##################################################################\n")
-    # print("\t...Running OR-tools solver...\n")
-    # or_routes= run_or_tools(puzzle, init_routes)
-	#
-    # routes_map(puzzle, or_routes, "ortools_routes_solution.html")
-	#
-    # print("\n##################################################################\n")
-    # print("\t...OR-tools solution...\n")
-	#
-    # or_routes.print_route_stats()
-	#
-    # current_time = utils.mytimeprint(current_time, start_time)
-	#
     print("\n##################################################################\n")
-    print("\t...Running our own LNS solver...\n")
+    print("\t...Running OR-tools solver...\n")
+
+    or_routes = run_or_tools(puzzle, init_routes)
+
+    viz.routes_map(puzzle, or_routes, "ortools_routes_solution.html")
+
+    print("\n##################################################################\n")
+    print("\t...OR-tools solution...\n")
+
+    or_routes.print_route_stats()
+
+    current_time = utils.mytimeprint(current_time, start_time)
+
+    print("\n##################################################################\n")
+    print("\t...Running LNS solver...\n")
 
     final_route, record_perf_df = run_vrp_solver(puzzle, init_routes)
-    routes_map(puzzle, final_route, "final_routes_postcodes.html")
 
     current_time = utils.mytimeprint(current_time, start_time)
 
     print("\n##################################################################\n")
 
     print("\n\t...Optimised Solution...\n")
+
     final_route.print_route_stats()
+
+    # Recording outputs
+    viz.routes_map(puzzle, final_route, "final_routes_postcodes.html")
+    viz.plot_convergence_cost(puzzle, record_perf_df, 'cost_converge.png')
+    utils.pickle_route_class(puzzle, final_route, "final_routes_postcodes.pckl")
+
+    current_time = utils.mytimeprint(current_time, start_time)
 
     print("\n##################################################################\n")
     end_date = datetime.now()
