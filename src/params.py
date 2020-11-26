@@ -19,6 +19,7 @@ lns_destroy_frac = 0.4
 lns_stop_converge = 100
 
 ## Simulated Annealing Parameters
+sa_max_iter = 10
 sa_control_temp = 1.33 # Needs to be greater than 1
 sa_cooling_rate = 0.81 # Needs to be smaller than 1
 
