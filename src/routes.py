@@ -21,6 +21,7 @@ class routes_class(object):
 	def __init__(self, puzzle):
 		self.num_vans = puzzle.max_vans
 		self.max_duty = puzzle.max_duty
+		self.min_duty = puzzle.min_duty
 		self.num_stops = puzzle.num_stops
 		self.total_time = None
 		self.stop_list = []
@@ -101,6 +102,20 @@ class routes_class(object):
 			return "Invalid"
 		else:
 			return "Valid"
+
+	# Validity Rule for optimisation
+	def invalid_routes_max_time(self):
+		if max([item[-1] for item in self.van_times]) > self.max_duty:
+			return True
+		else:
+			return False
+
+	# Validity Rule for optimisation
+	def invalid_routes_min_time(self):
+		if min([item[-1] for item in self.van_times]) < self.min_duty:
+			return True
+		else:
+			return False
 
 	# Validity Rule if needs to keep the Van number constant
 	def accept_routes_fixed_fleet_size(self):

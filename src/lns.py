@@ -1,4 +1,4 @@
-from random import sample, shuffle
+from random import sample, shuffle, seed
 from math import floor
 import numpy as np
 from utils import build_quick_routes
@@ -9,12 +9,14 @@ class lns_class(object):
 	This class implements the Large Neighbourhood Search algorithm by Pisinger, D., & Ropke, S. (2010)
 	"""
 
-	def __init__(self, puzzle, routes, lns_destroy_frac):
+	def __init__(self, puzzle, routes, lns_destroy_frac, seed_value):
 		self.stop_list = routes.stop_list  # current route
 		self.num_stops = routes.num_stops  # number of stops in the current route
 		self.lns_destroy_nb = int(floor(lns_destroy_frac * self.num_stops))  # number of stops to remove in the destroy step
 		self.puzzle = puzzle  # puzzle object
 		self.depot_id = puzzle.depot_id  # identifier of the depot
+
+		seed(seed_value)
 
 	def rnd_destroy(self):
 		"""

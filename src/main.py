@@ -28,36 +28,38 @@ def main():
 
     init_routes = routes_class(puzzle)
     init_routes.build_from_postcodes(puzzle)
+    # init_routes.build_at_random(puzzle)
     routes_map(puzzle, init_routes, "init_routes_postcodes.html")
 
-    print("\n\t...Input Solution...\n")
+    print("\n\t...Inital Solution...\n")
     init_routes.print_route_stats()
 
     current_time = utils.mytimeprint(current_time, start_time)
 
-    print("\n##################################################################\n")
-    print("\t...Running OR-tools solver...\n")
-    or_routes= run_or_tools(puzzle, init_routes)
-
-    routes_map(puzzle, or_routes, "ortools_routes_solution.html")
-
-    print("\n##################################################################\n")
-    print("\t...OR-tools solution...\n")
-
-    or_routes.print_route_stats()
-
-    current_time = utils.mytimeprint(current_time, start_time)
-
+    # print("\n##################################################################\n")
+    # print("\t...Running OR-tools solver...\n")
+    # or_routes= run_or_tools(puzzle, init_routes)
+	#
+    # routes_map(puzzle, or_routes, "ortools_routes_solution.html")
+	#
+    # print("\n##################################################################\n")
+    # print("\t...OR-tools solution...\n")
+	#
+    # or_routes.print_route_stats()
+	#
+    # current_time = utils.mytimeprint(current_time, start_time)
+	#
     print("\n##################################################################\n")
     print("\t...Running our own LNS solver...\n")
 
     final_route, record_perf_df = run_vrp_solver(puzzle, init_routes)
+    routes_map(puzzle, final_route, "final_routes_postcodes.html")
 
     current_time = utils.mytimeprint(current_time, start_time)
 
     print("\n##################################################################\n")
 
-    print("\n\t...Input Solution...\n")
+    print("\n\t...Optimised Solution...\n")
     final_route.print_route_stats()
 
     print("\n##################################################################\n")

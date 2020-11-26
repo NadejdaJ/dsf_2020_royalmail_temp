@@ -19,6 +19,7 @@ class puzzle_class(object):
 		""" Puzzle Constraints """
 		self.max_vans = input.max_vans
 		self.max_duty = input.max_duty
+		self.min_duty = input.min_duty
 		self.service_time = input.service_time
 		self.departure_time = input.departure_time
 		""" Puzzle Dataset """
