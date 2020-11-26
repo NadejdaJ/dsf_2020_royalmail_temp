@@ -47,8 +47,7 @@ def create_data_model(puzzle, init_routes):
 
 	data_df = puzzle.data.reset_index()
 
-	init_route = [[data_df[data_df.id == x].index.values[0] for x in xs] for xs in no_hub]
-	init_route = [list(set(tuple(i))) for i in init_route]
+	init_route = [[data_df[data_df.id == x].index.values[0]+1 for x in xs] for xs in no_hub]
 
 	ids_df = get_stop_postcodes(puzzle)
 
