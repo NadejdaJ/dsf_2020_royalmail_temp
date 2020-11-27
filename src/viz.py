@@ -5,6 +5,7 @@ import numpy as np
 from datetime import datetime, timedelta
 import params
 import matplotlib.pyplot as plt
+import ast
 
 coloricons_choices = [
     'red', 'blue', 'green', 'orange', 'purple', 'pink', 'cadetblue', 'darkred', 'darkblue',
@@ -24,7 +25,7 @@ def init_map(puzzle, map_name):
 
     for i in puzzle.data.postcode:
         POSTCODE = i
-        POP = 'Postcode ' + POSTCODE + '-\tID: ' + puzzle.data.loc[puzzle.data.postcode == POSTCODE].id.values[0]
+        POP = 'Postcode ' + POSTCODE + '-\tID: ' + puzzle.data.loc[puzzle.data.postcode == POSTCODE].index.values[0]
         LAT = puzzle.data.loc[puzzle.data.postcode == POSTCODE].latitude.values[0]
         LON = puzzle.data.loc[puzzle.data.postcode == POSTCODE].longitude.values[0]
 
@@ -154,14 +155,15 @@ def plot_convergence_cost(puzzle, record_perf_df, fig_name):
 
 def plot_cost_per_van(puzzle, record_perf_df, fig_name):
     colours = ['red', 'green', 'cyan', 'orange', 'purple']
-    route_van_times = list(np.array(record_perf_df.route_drive_time.values).T)
-    best_van_times = list(np.array(record_perf_df.best_drive_time.values).T)
+    route_van_times = list(np.array([ast.literal_eval(x) for x in record_perf_df.route_drive_time.values]).T)
+    best_van_times = list(np.array([ast.literal_eval(x) for x in record_perf_df.best_drive_time.values]).T)
 
     fig, ax1 = plt.subplots()
     ax1.grid()
     for i in range(len(route_van_times)):
-        ax1.plot(range(len(route_van_times[i])), route_van_times[i], colours=colours[i], linestyle='dashed', label='Van {}'.format(i))
-        ax1.plot(range(len(best_van_times[i])), best_van_times[i], colours=colours[i], label='Van {}'.format(i))
+        print(i)
+        ax1.plot(range(len(route_van_times[i])), route_van_times[i], color=colours[i], linestyle='dashed', label='Van {}'.format(i))
+        ax1.plot(range(len(best_van_times[i])), best_van_times[i], color=colours[i], label='Van {}'.format(i))
 
     plt.title("Cost per van")
     ax1.set_xlabel('Number of iterations')
