@@ -81,4 +81,17 @@ pip install -r requirements.txt
 If this fails, you may have to upgrade your pip version first with `pip install pip --upgrade`.
 
 ## Quick Start Guide
+We will start exploring and developing the codebase via a notebook:
+```bash
+jupyter notebook DSF_main.ipynb
+```
+
+## Full Pipeline
+Once the pipeline will be complete, a simple launch through the command line will run the optimisation engine:
+
+```bash
+cd ./src/
+python main.py
+```
+
 
